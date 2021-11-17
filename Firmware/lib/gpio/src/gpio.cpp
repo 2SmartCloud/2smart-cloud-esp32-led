@@ -1,19 +1,14 @@
 #include "gpio.h"
 
-#include "ledStrip.h"
-
-#define NOISE_FILTER 300
-
 uint64_t lastClickButton = 0;
-hw_timer_t* timer = NULL;
-bool btnPressed = false;
+hw_timer_t* timer = nullptr;
 
 void IRAM_ATTR onTimer() {
     if (!digitalRead(ERASE_FLASH)) {
-        eraseFlag = true;
+        erase_flag = true;
+    } else {
+        timerAlarmDisable(timer);
     }
-    timerAlarmDisable(timer);
-    timerEnd(timer);
 }
 
 void IRAM_ATTR eraseInterrupt() {
@@ -26,27 +21,4 @@ void IRAM_ATTR eraseInterrupt() {
 void setGpios() {
     pinMode(ERASE_FLASH, INPUT_PULLUP);
     attachInterrupt(ERASE_FLASH, eraseInterrupt, FALLING);
-    pinMode(LED_STATUS, OUTPUT);
-    digitalWrite(LED_STATUS, LOW);
-    pinMode(BUTTON, INPUT_PULLUP);
-}
-
-void checkButtons() {
-    if (!digitalRead(BUTTON)) {
-        if (btnPressed && millis() - lastClickButton > LS_OFF_TIME) {
-            newLsState = NEW_MODE;
-            if (ls.state) newLsMqttData = true;
-            ls.state = false;
-        }
-        if (!btnPressed && millis() - lastClickButton > NOISE_FILTER) {
-            lastClickButton = millis();
-            newLsState = NEW_MODE;
-            if (++ls.mode > lsModes.size() - 1) ls.mode = 0;
-            btnPressed = true;
-            newLsMqttData = true;
-            if (!ls.state) stateChanged = true;
-            ls.state = true;
-        }
-    }
-    if (digitalRead(BUTTON)) btnPressed = false;
 }
