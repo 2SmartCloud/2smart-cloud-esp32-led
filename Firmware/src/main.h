@@ -17,7 +17,7 @@ String product_id = "1625478058454605";  // production id
 // -------------------------------------------------------MQTT variables
 
 const char* device_name = "2Smart Led Strip";
-const char* device_version = "5";
+const char* device_version = "6";
 const char* firmware_name = "1625478058454605";
 
 void HandleMessage(char* topic, byte* payload, unsigned int length);
