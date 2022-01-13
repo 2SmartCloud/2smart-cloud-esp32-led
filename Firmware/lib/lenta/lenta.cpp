@@ -19,6 +19,7 @@ bool Lenta::Init(Homie* homie) {  // initialize toggles for notification
     leds_ptr_ = new CRGB[ls.quantity_];
     FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds_ptr_, ls.quantity_).setCorrection(TypicalLEDStrip);
     FastLED.setMaxPowerInVoltsAndMilliamps(5, kMax_ma_);
+    TurnOffLs();
     new_ls_state_ = NO_CHANGES;
     FastLED.setBrightness(ls.brightness_ * 2);
     if (ls.mode_ == COLOR) new_ls_state_ = NEW_MODE;
@@ -105,6 +106,9 @@ void Lenta::HandleCurrentState() {
             case DISCO:
                 Disco();
                 break;
+            case GARLAND:
+                Garland();
+                break;
         }
     } else if (new_ls_state_) {
         TurnOffLs();
@@ -140,6 +144,34 @@ void Lenta::Rainbow() {
     counter_++;  // 0 to 255 (byte data type)
     FastLED.show();
     delay(10);  // moving speed
+}
+
+void Lenta::Garland() {
+    if (leds_ptr_ == nullptr) return;
+    const uint8_t delay_ = 30;
+    if (millis() - effects_timer_ < delay_) return;
+
+    if (counter_ > 0 && counter_ < 85) {
+        for (int i = 0; i < ls.quantity_; i += 3) {
+            leds_ptr_[i] = CRGB((counter_ < 43 ? counter_ : (84 - counter_)) * 5, 0, 0);
+        }
+    }
+
+    if (counter_ > 84 && counter_ < 169) {
+        for (int i = 1; i < ls.quantity_; i += 3) {
+            leds_ptr_[i] = CRGB(0, (counter_ < 127 ? (counter_ - 84) : (168 - counter_)) * 5, 0);
+        }
+    }
+
+    if (counter_ > 168 && counter_ < 253) {
+        for (int i = 2; i < ls.quantity_; i += 3) {
+            leds_ptr_[i] = CRGB(0, 0, (counter_ < 211 ? (counter_ - 168) : (252 - counter_)) * 5);
+        }
+    }
+    counter_++;
+    if (counter_ >= 253) counter_ = 0;
+    FastLED.show();
+    effects_timer_ = millis();
 }
 
 void Lenta::ExtractColor(String color_string) {

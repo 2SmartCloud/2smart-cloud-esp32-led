@@ -35,13 +35,14 @@ class Lenta : public Node {
     } LsSettings;
 
     enum LsNewState { NO_CHANGES, NEW_COLOR, NEW_BRIGHTNESS, NEW_MODE };
-    enum LedStripStates { RAINBOW, COLOR, DISCO };
+    enum LedStripStates { RAINBOW, COLOR, DISCO, GARLAND };
 
     LsSettings ls = {1, 0, 20, kDefaultColor_, kDefaultColor_, kDefaultColor_, 300};
 
     void TurnOffLs();
     void Rainbow();
     void Disco();
+    void Garland();
     void ChangeColor();
     void ExtractColor(String color_string);
 
@@ -63,8 +64,9 @@ class Lenta : public Node {
     uint8_t counter_ = 0;
     uint32_t period_loop_ = millis();
     uint32_t last_update_time_ = 0;
+    uint32_t effects_timer_ = 0;
 
-    std::map<uint8_t, String> modes_ = {{RAINBOW, "rainbow"}, {COLOR, "color"}, {DISCO, "disco"}};
+    std::map<uint8_t, String> modes_ = {{RAINBOW, "rainbow"}, {COLOR, "color"}, {DISCO, "disco"}, {GARLAND, "garland"}};
 
     EncButton<EB_TICK, 13> button_;
 };

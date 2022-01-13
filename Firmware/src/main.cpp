@@ -18,6 +18,18 @@ NtpTimeClient *time_client = new NtpTimeClient();
 WifiClient wifi_client;
 
 void setup() {
+        /* -------------------- Start init your nodes and properties --------------------*/
+
+    Lenta *lenta = new Lenta("ledStrip", "ledstrip", &device);  // (name, id, device)
+    Property *lenta_status = new Property("switch", "switch", lenta, SENSOR, true, true, "boolean");
+    Property *lenta_mode = new Property("mode", "mode", lenta, SENSOR, true, true, "enum", lenta->GetModes());
+    Property *lenta_color = new Property("color", "color", lenta, SENSOR, true, true, "color", "rgb");
+    Property *lenta_brightness =
+        new Property("brightness", "brightness", lenta, SENSOR, true, true, "integer", "0:100");
+    Property *lenta_quantity = new Property("quantity", "quantity", lenta, SENSOR, true, true, "integer");
+
+    /* -------------------- End init your nodes and properties --------------------*/
+
     Serial.begin(115200);
     setGpios();
     if (!InitFiles() || !LoadConfig()) {
@@ -57,38 +69,8 @@ void setup() {
     device.SetNotifier(&notifier);
 
     Property *dev_ip = new Property("ipw", "ipw", &device, TELEMETRY, false, true, "string");
-    device.AddProperty(dev_ip);
 
-    firmware->AddProperty(fw_version);
-    firmware->AddProperty(update_status);
-    firmware->AddProperty(update_button);
-    firmware->AddProperty(update_time);
-    firmware->AddProperty(auto_update);
     firmware->SetTimeClient(time_client);
-    device.AddNode(firmware);
-
-    notifications->AddProperty(system_notification);
-    notifications->AddProperty(update_notification);
-    device.AddNode(notifications);
-
-    /* -------------------- Start init your nodes and properties --------------------*/
-
-    Lenta *lenta = new Lenta("ledStrip", "ledstrip", &device);  // (name, id, device)
-    Property *lenta_status = new Property("switch", "switch", lenta, SENSOR, true, true, "boolean");
-    Property *lenta_mode = new Property("mode", "mode", lenta, SENSOR, true, true, "enum", lenta->GetModes());
-    Property *lenta_color = new Property("color", "color", lenta, SENSOR, true, true, "color", "rgb");
-    Property *lenta_brightness =
-        new Property("brightness", "brightness", lenta, SENSOR, true, true, "integer", "0:100");
-    Property *lenta_quantity = new Property("quantity", "quantity", lenta, SENSOR, true, true, "integer");
-
-    lenta->AddProperty(lenta_status);
-    lenta->AddProperty(lenta_mode);
-    lenta->AddProperty(lenta_color);
-    lenta->AddProperty(lenta_brightness);
-    lenta->AddProperty(lenta_quantity);
-    device.AddNode(lenta);
-
-    /* -------------------- End init your nodes and properties --------------------*/
 
     homie.SetDevice(&device);
 
