@@ -18,18 +18,6 @@ NtpTimeClient *time_client = new NtpTimeClient();
 WifiClient wifi_client;
 
 void setup() {
-        /* -------------------- Start init your nodes and properties --------------------*/
-
-    Lenta *lenta = new Lenta("ledStrip", "ledstrip", &device);  // (name, id, device)
-    Property *lenta_status = new Property("switch", "switch", lenta, SENSOR, true, true, "boolean");
-    Property *lenta_mode = new Property("mode", "mode", lenta, SENSOR, true, true, "enum", lenta->GetModes());
-    Property *lenta_color = new Property("color", "color", lenta, SENSOR, true, true, "color", "rgb");
-    Property *lenta_brightness =
-        new Property("brightness", "brightness", lenta, SENSOR, true, true, "integer", "0:100");
-    Property *lenta_quantity = new Property("quantity", "quantity", lenta, SENSOR, true, true, "integer");
-
-    /* -------------------- End init your nodes and properties --------------------*/
-
     Serial.begin(115200);
     setGpios();
     if (!InitFiles() || !LoadConfig()) {
@@ -45,6 +33,14 @@ void setup() {
         device_id = bufferMacAddr;
     }
     String ip_addr = WiFi.localIP().toString();
+
+    Lenta *lenta = new Lenta("ledStrip", "ledstrip", &device);  // (name, id, device)
+    Property *lenta_status = new Property("switch", "switch", lenta, SENSOR, true, true, "boolean");
+    Property *lenta_mode = new Property("mode", "mode", lenta, SENSOR, true, true, "enum", lenta->GetModes());
+    Property *lenta_color = new Property("color", "color", lenta, SENSOR, true, true, "color", "rgb");
+    Property *lenta_brightness =
+        new Property("brightness", "brightness", lenta, SENSOR, true, true, "integer", "0:100");
+    Property *lenta_quantity = new Property("quantity", "quantity", lenta, SENSOR, true, true, "integer");
 
     // ---------------------------------------------- Homie convention init
     AutoUpdateFw *firmware = new AutoUpdateFw("Firmware", "firmware", &device);                   // (name, id, device)
@@ -110,7 +106,12 @@ void setup() {
 void loop() {
     wifi_client.Connect();
 
-    homie.HandleCurrentState();  // mqttLoop();
+    // homie requires connected wifi client
+    if (wifi_client.isConnected()) {
+        homie.HandleCurrentState();
+    } else {  // standalone mode
+        device.HandleCurrentState();
+    }
 
     if (erase_flag) {
         EraseFlash();
