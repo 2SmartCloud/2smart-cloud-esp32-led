@@ -2,12 +2,8 @@
 
 #include "file_system/src/file_system.h"
 
-Lenta::Lenta(const char* name, const char* id, Device* device) : Node(name, id, device) {}
-
-bool Lenta::Init(Homie* homie) {  // initialize toggles for notification
-    bool status = true;
-    if (!Node::Init(homie)) status = false;
-    if (!LoadLentaSettings()) {
+Lenta::Lenta(const char* name, const char* id, Device* device) : Node(name, id, device) {
+    if (!ReadSettings("/lentaconf.txt", reinterpret_cast<byte*>(&ls), sizeof(ls))) {
         ls.brightness_ = kDefaultBrigthness_;
         ls.state_ = true;
         ls.mode_ = RAINBOW;
@@ -16,6 +12,7 @@ bool Lenta::Init(Homie* homie) {  // initialize toggles for notification
         ls.blue_ = kDefaultColor_ * 3;
         ls.quantity_ = kDefaultLedsQuantity_;
     }
+
     leds_ptr_ = new CRGB[ls.quantity_];
     FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds_ptr_, ls.quantity_).setCorrection(TypicalLEDStrip);
     FastLED.setMaxPowerInVoltsAndMilliamps(5, kMax_ma_);
@@ -23,7 +20,15 @@ bool Lenta::Init(Homie* homie) {  // initialize toggles for notification
     new_ls_state_ = NO_CHANGES;
     FastLED.setBrightness(ls.brightness_ * 2);
     if (ls.mode_ == COLOR) new_ls_state_ = NEW_MODE;
+}
+
+bool Lenta::Init(Homie* homie) {  // initialize toggles for notification
+    bool status = true;
+    if (!Node::Init(homie)) status = false;
+
+    LoadLentaSettings();
     HandleCurrentState();
+
     return status;
 }
 
@@ -40,11 +45,6 @@ void Lenta::HandleCurrentState() {
         String state_in_string = ls.state_ ? "true" : "false";
         properties_.find("switch")->second->SetValue(state_in_string);
         new_ls_state_ = NEW_MODE;
-    }
-
-    if (millis() - period_loop_ > 1000) {
-        Serial.println("notify node loop");
-        period_loop_ = millis();
     }
 
     if (properties_.find("switch")->second->HasNewValue()) {
