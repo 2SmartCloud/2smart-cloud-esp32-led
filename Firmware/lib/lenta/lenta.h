@@ -37,8 +37,6 @@ class Lenta : public Node {
     enum LsNewState { NO_CHANGES, NEW_COLOR, NEW_BRIGHTNESS, NEW_MODE };
     enum LedStripStates { RAINBOW, COLOR, DISCO, GARLAND };
 
-    LsSettings ls = {1, 0, 20, kDefaultColor_, kDefaultColor_, kDefaultColor_, 300};
-
     void TurnOffLs();
     void Rainbow();
     void Disco();
@@ -52,9 +50,13 @@ class Lenta : public Node {
     const uint16_t kMax_ma_ = 1500;  // max mA, for library
 
     const uint8_t kDefaultBrigthness_ = 10;
-    const uint8_t kDefaultColor_ = 80;
+    const uint8_t kDefaultColorR_ = 50;
+    const uint8_t kDefaultColorG_ = 200;
+    const uint8_t kDefaultColorB_ = 200;
     const uint16_t kDefaultLedsQuantity_ = 300;         // 5m led strip
     const uint16_t kSaveLentaSettingsTime_ = 5 * 1000;  // 5s
+
+    LsSettings ls = {1, 0, 20, kDefaultColorR_, kDefaultColorG_, kDefaultColorB_, 300};
 
     bool new_data_for_save_ = false;
 
