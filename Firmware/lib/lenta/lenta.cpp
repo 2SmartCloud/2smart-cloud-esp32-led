@@ -7,9 +7,9 @@ Lenta::Lenta(const char* name, const char* id, Device* device) : Node(name, id, 
         ls.brightness_ = kDefaultBrigthness_;
         ls.state_ = true;
         ls.mode_ = RAINBOW;
-        ls.red_ = kDefaultColor_;
-        ls.green_ = kDefaultColor_ * 2;
-        ls.blue_ = kDefaultColor_ * 3;
+        ls.red_ = kDefaultColorR_;
+        ls.green_ = kDefaultColorG_;
+        ls.blue_ = kDefaultColorB_;
         ls.quantity_ = kDefaultLedsQuantity_;
     }
 
