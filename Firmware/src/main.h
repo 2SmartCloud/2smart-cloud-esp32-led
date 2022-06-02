@@ -28,7 +28,7 @@ const char *http_username = "admin";
 // -------------------------------------------------------Production settings
 String product_id = "1625478058454605";  // product id
 const char* device_name = "2Smart Led Strip";
-const char* device_version = "8";
+const char* device_version = "9";
 String device_id = "";  // DeviceID/MAC:adress
 const char *firmware_name = product_id.c_str();
 // --------------------------------------------------------------------------
